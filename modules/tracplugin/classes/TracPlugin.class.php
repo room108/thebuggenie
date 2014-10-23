@@ -78,6 +78,116 @@
 			return TBGContext::getRouting()->generate('tracplugin_index');
 		}
 
+		public function postConfigSettings(TBGRequest $request)
+		{
+			TBGContext::loadLibrary('common');
+			$project_name = $request->getParameter('project_name_');
+			$settings = array('smtp_server_address', 'smtp_server_port', 'smtp_user', 'smtp_pwd', 'from_name');
+			$project_settings = array('path_trac_project_', 'manager_email_');
+
+			foreach ($settings as $setting)
+			{
+				if ($request->getParameter($setting) !== null)
+				{
+					$value = $request->getParameter($setting);
+					$dns_regex = '(\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b|(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\]))';
+					$mail_regex = '(?:[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@';
+					switch($setting)
+					{
+						case 'smtp_server_address':
+							if ($request['mail_type'] == TBGMailer::MAIL_TYPE_B2M && !tbg_check_syntax($value, "MAILSERVER"))
+							{
+								throw new Exception(TBGContext::getI18n()->__('Please provide a valid setting for SMTP server address'));
+							}
+							break;
+						case 'smtp_server_port':
+							if (!is_numeric($value) || $value < 1)
+							{
+								throw new Exception(TBGContext::getI18n()->__('Please provide a valid setting for SMTP server port'));
+							}
+							break;
+					}
+					$this->saveSetting($setting, $value);
+				}
+			}
+
+			if (trim($project_name) !== "")
+			{
+				$project = $this->createProject($project_name);
+				foreach ($project_settings as $setting)
+				{
+					$value = $request->getParameter($setting);
+					if ($setting === 'manager_email_')
+					{
+						if (!tbg_check_syntax($value, "EMAIL"))
+						{
+							throw new Exception(TBGContext::getI18n()->__('Please provide a valid setting for email "from"-address'));
+						}
+					}
+					$this->saveSetting($setting.$project->getKey(), $value);
+				}
+			}
+
+			$projects = TBGProject::getAll();
+			foreach ($projects as $key => $value)
+            {
+				foreach ($project_settings as $setting)
+				{
+					$setting = $setting . $key;
+					$value = $request->getParameter($setting);
+					if ($value !== "")
+					{
+						if ($setting === 'manager_email_'.$key)
+						{
+							if (!tbg_check_syntax($value, "EMAIL"))
+							{
+								throw new Exception(TBGContext::getI18n()->__('Please provide a valid setting for email "from"-address'));
+							}
+						}
+						$this->saveSetting($setting, $value);
+					}
+				}
+            }
+		}
+
+		/**
+		 * Add a project (AJAX call)
+		 *
+		 * @param TBGRequest $request The request object
+		 */
+		public function createProject($name)
+		{
+			$i18n = TBGContext::getI18n();
+
+			if (!TBGContext::getScope()->hasProjectsAvailable())
+			{
+				$this->getResponse()->setHttpStatus(400);
+				return $this->renderJSON(array("error" => $i18n->__("There are no more projects available in this instance")));
+			}
+			if (($p_name = $name) && trim($p_name) != '')
+			{
+				try
+				{
+					$project = new TBGProject();
+					$project->setName($p_name);
+					$project->save();
+					return $project;
+				}
+				catch (InvalidArgumentException $e)
+				{
+					$this->getResponse()->setHttpStatus(400);
+					return $this->renderJSON(array("error" => $i18n->__('A project with the same key already exists')));
+				}
+				catch (Exception $e)
+				{
+					$this->getResponse()->setHttpStatus(400);
+					return $this->renderJSON(array("error" => $i18n->__('An error occurred: '. $e->getMessage())));
+				}
+			}
+			$this->getResponse()->setHttpStatus(400);
+			return $this->renderJSON(array("error" => $i18n->__("You don't have access to add projects")));
+		}
+
 		public function listen_issue_create(TBGEvent $event)
 		{
 			// TODO Create Bug Report on Trac.

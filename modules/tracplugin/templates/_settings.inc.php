@@ -6,28 +6,57 @@
 </div>
 <div id="tracplugin_settings_menu_panes">
     <div id="tracplugin_tab_settings_pane" style="margin: 10px 0 0 0; width: 740px;<?php if ($access_level == TBGSettings::ACCESS_FULL): ?> border-bottom: 0;<?php endif; ?>">
+        <div style="margin-top: 5px; width: 750px; clear: both; height: 30px;" class="tab_menu">
+            <ul id="tracplugin_settings_projects">
+                <li class="selected" id="tracplugin_tab_new_project"><a onclick="TBG.Main.Helpers.tabSwitcher('tracplugin_tab_new_project', 'tracplugin_settings_projects');" href="javascript:void(0);"><?php echo __('New project'); ?></a></li>
+                <?php foreach ($projects as $key => $value): ?>
+                <li id="tracplugin_tab_project_<?php echo $key; ?>"><a onclick="TBG.Main.Helpers.tabSwitcher('tracplugin_tab_project_<?php echo $key; ?>', 'tracplugin_settings_projects');" href="javascript:void(0);"><?php echo $value->getName(); ?></a></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
         <form accept-charset="<?php echo TBGContext::getI18n()->getCharset(); ?>" action="<?php echo make_url('configure_module', array('config_module' => $module->getName())); ?>" enctype="multipart/form-data" method="post">
-            <div class="rounded_box borderless mediumgrey<?php if ($access_level == TBGSettings::ACCESS_FULL): ?> cut_bottom<?php endif; ?>" style="margin: 10px 0 0 0; width: 744px;<?php if ($access_level == TBGSettings::ACCESS_FULL): ?> border-bottom: 0;<?php endif; ?>">
-                <div class="content" style="padding-bottom: 10px;"><?php echo __('Settings to create a project associated with a Trac project.'); ?></div>
-                <table style="width: 680px;" class="padded_table" cellpadding=0 cellspacing=0 id="mailnotification_settings_table">
-                    <tr>
-                        <td style="width: 40%; padding: 5px;"><label for="project_name_input"><?php echo __('Project name:'); ?></label></td>
-                        <td><input type="text" name="project_name_input" id="project_name_input" style="width: 100%;"></td>
-                    </tr>
-                    <tr>
-                        <td style="width: 40%; padding: 5px;"><label for="path_trac_project_input"><?php echo __('Path to the Trac project:'); ?></label></td>
-                        <td><input type="text" name="path_trac_project_input" id="path_trac_project_input" style="width: 100%;"></td>
-                    </tr>
-                    <tr>
-                        <td style="width: 40%; padding: 5px;"><label for="manager_email_input"><?php echo __('Email of the project manager:'); ?></label></td>
-                        <td><input type="text" name="manager_email_input" id="manager_email_input" style="width: 100%;"></td>
-                    </tr>
-                </table>
+        <div id="tracplugin_settings_projects_panes" style="margin: 0;">
+            <div id="tracplugin_tab_new_project_pane" style="margin: 10px 0 0 0; width: 740px;<?php if ($access_level == TBGSettings::ACCESS_FULL): ?> border-bottom: 0;<?php endif; ?>">
+                <div class="rounded_box borderless mediumgrey<?php if ($access_level == TBGSettings::ACCESS_FULL): ?> cut_bottom<?php endif; ?>" style="margin: 10px 0 0 0; width: 744px;<?php if ($access_level == TBGSettings::ACCESS_FULL): ?> border-bottom: 0;<?php endif; ?>">
+                    <div class="content" style="padding-bottom: 10px;"><?php echo __('Settings to create a project associated with a Trac project.'); ?></div>
+                    <table style="width: 680px;" class="padded_table" cellpadding=0 cellspacing=0 id="mailnotification_settings_table">
+                        <tr>
+                            <td style="width: 40%; padding: 5px;"><label for="project_name_"><?php echo __('Project name:'); ?></label></td>
+                            <td><input type="text" name="project_name_" id="project_name_" style="width: 100%;"></td>
+                        </tr>
+                        <tr>
+                            <td style="width: 40%; padding: 5px;"><label for="path_trac_project_"><?php echo __('Path to the Trac project:'); ?></label></td>
+                            <td><input type="text" name="path_trac_project_" id="path_trac_project_" style="width: 100%;"></td>
+                        </tr>
+                        <tr>
+                            <td style="width: 40%; padding: 5px;"><label for="manager_email_"><?php echo __('Email of the project manager:'); ?></label></td>
+                            <td><input type="text" name="manager_email_" id="manager_email_" style="width: 100%;"></td>
+                        </tr>
+                    </table>
+                </div>
             </div>
+            <?php foreach ($projects as $key => $value): ?>
+            <div id="tracplugin_tab_project_<?php echo $key; ?>_pane" style="margin: 10px 0 0 0; width: 740px; display: none; <?php if ($access_level == TBGSettings::ACCESS_FULL): ?> border-bottom: 0;<?php endif; ?>">
+                <div class="rounded_box borderless mediumgrey<?php if ($access_level == TBGSettings::ACCESS_FULL): ?> cut_bottom<?php endif; ?>" style="margin: 10px 0 0 0; width: 744px;<?php if ($access_level == TBGSettings::ACCESS_FULL): ?> border-bottom: 0;<?php endif; ?>">
+                    <div class="content" style="padding-bottom: 10px;"><?php echo __('Settings to create a project associated with a Trac project.'); ?></div>
+                    <table style="width: 680px;" class="padded_table" cellpadding=0 cellspacing=0 id="mailnotification_settings_table">
+                        <tr>
+                            <td style="width: 40%; padding: 5px;"><label for="path_trac_project_<?php echo $key; ?>"><?php echo __('Path to the Trac project:'); ?></label></td>
+                            <td><input type="text" name="path_trac_project_<?php echo $key; ?>" id="path_trac_project_<?php echo $key; ?>" value="<?php echo $module->getSetting('path_trac_project_'.$key); ?>" style="width: 100%;"></td>
+                        </tr>
+                        <tr>
+                            <td style="width: 40%; padding: 5px;"><label for="manager_email_<?php echo $key; ?>"><?php echo __('Email of the project manager:'); ?></label></td>
+                            <td><input type="text" name="manager_email_<?php echo $key; ?>" id="manager_email_<?php echo $key; ?>" value="<?php echo $module->getSetting('manager_email_'.$key); ?>" style="width: 100%;"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
         <?php if ($access_level == TBGSettings::ACCESS_FULL): ?>
             <div class="rounded_box iceblue borderless cut_top" style="margin: 0 0 5px 0; width: 740px; border-top: 0; padding: 8px 5px 2px 5px; height: 25px;">
-                <div style="float: left; font-size: 13px; padding-top: 2px;"><?php echo __('Click "%create%" to create the project', array('%create%' => __('Create Project'))); ?></div>
-                <input type="submit" id="submit_settings_button" style="float: right; padding: 0 10px 0 10px; font-size: 14px; font-weight: bold;" value="<?php echo __('Create Project'); ?>">
+                <div style="float: left; font-size: 13px; padding-top: 2px;"><?php echo __('Click "%create%" to create the project', array('%create%' => __('Save Project'))); ?></div>
+                <input type="submit" id="submit_settings_button" style="float: right; padding: 0 10px 0 10px; font-size: 14px; font-weight: bold;" value="<?php echo __('Save Project'); ?>">
             </div>
         <?php endif; ?>
         </form>
@@ -38,8 +67,8 @@
                 <div class="content" style="padding-bottom: 10px;"><?php echo __('Settings for outgoing emails, such as bug notification emails.'); ?></div>
                 <table style="width: 680px;" class="padded_table" cellpadding=0 cellspacing=0 id="mailnotification_settings_table">
                     <tr>
-                        <td style="width: 40%; padding: 5px;"><label for="smtp_server_address_input"><?php echo __('SMTP server address:'); ?></label></td>
-                        <td><input type="text" name="smtp_server_address_input" id="smtp_server_address_input" value="<?php echo $module->getSetting('smtp_server_address_input'); ?>" style="width: 100%;"></td>
+                        <td style="width: 40%; padding: 5px;"><label for="smtp_server_address"><?php echo __('SMTP server address:'); ?></label></td>
+                        <td><input type="text" name="smtp_server_address" id="smtp_server_address" value="<?php echo $module->getSetting('smtp_server_address'); ?>" style="width: 100%;"></td>
                     </tr>
                     <tr>
                         <td style="width: 40%; padding: 5px;"><label for="smtp_server_port"><?php echo __('SMTP server port:'); ?></label></td>
@@ -60,8 +89,8 @@
                         <td class="config_explanation" colspan="2"><?php echo __('The password used for sending emails.'); ?></td>
                     </tr>
                     <tr>
-                        <td style="width: 40%; padding: 5px;"><label for="name_input"><?php echo __('Name:'); ?></label></td>
-                        <td><input type="text" name="name_input" id="name_input" value="<?php echo $module->getSetting('name_input'); ?>" style="width: 100%;"<?php echo ($access_level != TBGSettings::ACCESS_FULL) ? ' disabled' : ''; ?>></td>
+                        <td style="width: 40%; padding: 5px;"><label for="from_name"><?php echo __('Name:'); ?></label></td>
+                        <td><input type="text" name="from_name" id="from_name" value="<?php echo $module->getSetting('from_name'); ?>" style="width: 100%;"<?php echo ($access_level != TBGSettings::ACCESS_FULL) ? ' disabled' : ''; ?>></td>
                     </tr>
                     <tr>
                         <td class="config_explanation" colspan="2"><?php echo __('The alias for the email.'); ?></td>

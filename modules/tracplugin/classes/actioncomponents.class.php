@@ -7,6 +7,11 @@
 	{
         public function componentSettings()
         {
+            $projects = TBGProject::getAll();
+            foreach ($projects as $key => $value)
+            {
+                $this->projects = $projects;
+            }
         }
 	}
 

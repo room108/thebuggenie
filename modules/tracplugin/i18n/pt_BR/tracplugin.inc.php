@@ -4,6 +4,10 @@
     $strings['Project settings'] = 'Configurações de projeto';
     $strings['Mail settings'] = 'Configurações de email';
 
+// Project settings tabs strings
+// ----------------------------------------------------------------------------
+    $strings['New project'] = 'Novo projeto';
+
 // Project settings strings
 // ----------------------------------------------------------------------------
     $strings['Settings to create a project associated with a Trac project.'] = 'Configurações para criar um projeto associado a um projeto no Trac.';
@@ -11,7 +15,7 @@
     $strings['Path to the Trac project:'] = 'Caminho para projeto no Trac:';
     $strings['Email of the project manager:'] = 'Email do gerente de projeto:';
     $strings['Click "%create%" to create the project'] = 'Clique em "%create%" para criar o projeto';
-    $strings['Create Project'] = 'Criar Projeto';
+    $strings['Save Project'] = 'Salvar Projeto';
 
 // Mail settings strings
 // ----------------------------------------------------------------------------
